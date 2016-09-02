@@ -20,7 +20,6 @@
 + (void)showStatusBarSuccessStr:(NSString *)tipStr;
 + (void)showStatusBarErrorStr:(NSString *)errorStr;
 + (void)showStatusBarError:(NSError *)error;
-+ (void)showCaptchaViewParams:(NSMutableDictionary *)params;
 
 #pragma mark BaseURL
 + (NSString *)baseURLStr;
@@ -43,7 +42,6 @@
 + (id)loadResponseWithPath:(NSString *)requestPath;//返回一个NSDictionary类型的json数据
 + (BOOL)deleteResponseCacheForPath:(NSString *)requestPath;
 + (BOOL)deleteResponseCache;
-+ (NSUInteger)getResponseCacheSize;
 
 #pragma mark NetError
 -(id)handleResponse:(id)responseJSON;

@@ -14,6 +14,7 @@
 #import "UITTTAttributedLabel.h"
 typedef void (^CommentClickedBlock) (Tweet *curTweet, NSInteger index, id sender);
 typedef void (^DeleteClickedBlock) (Tweet *curTweet, NSInteger outTweetsIndex);
+typedef void (^LikeBtnClickedBlock) (Tweet *curTweet);
 typedef void (^UserBtnClickedBlock) (User *curUser);
 typedef void (^MoreLikersBtnClickedBlock) (Tweet *curTweet);
 typedef void (^LocationClickedBlock) (Tweet *curTweet);
@@ -24,11 +25,12 @@ typedef void (^LocationClickedBlock) (Tweet *curTweet);
 - (void)setTweet:(Tweet *)tweet needTopView:(BOOL)needTopView;
 
 @property (nonatomic, copy) CommentClickedBlock commentClickedBlock;
+@property (nonatomic, copy) LikeBtnClickedBlock likeBtnClickedBlock;
 @property (nonatomic, copy) UserBtnClickedBlock userBtnClickedBlock;
 @property (nonatomic, copy) MoreLikersBtnClickedBlock moreLikersBtnClickedBlock;
 @property (nonatomic, copy) DeleteClickedBlock deleteClickedBlock;
 @property (nonatomic, copy) void(^goToDetailTweetBlock) (Tweet *curTweet);
-@property (copy, nonatomic) void (^cellRefreshBlock)();
+@property (copy, nonatomic) void (^refreshSingleCCellBlock)();
 @property (copy, nonatomic) void (^mediaItemClickedBlock)(HtmlMediaItem *curItem);
 
 

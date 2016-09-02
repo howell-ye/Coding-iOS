@@ -8,7 +8,6 @@
 
 #import "BaseViewController.h"
 #import "ConversationViewController.h"
-#import "MRDetailViewController.h"
 
 #import "Login.h"
 #import <RegexKitLite-NoWarning/RegexKitLite.h>
@@ -32,6 +31,7 @@
 #import "CSTopicDetailVC.h"
 #import "CodeViewController.h"
 #import "Ease_2FA.h"
+#import <Google/Analytics.h>
 
 #import "UnReadManager.h"
 
@@ -86,6 +86,10 @@ typedef NS_ENUM(NSInteger, AnalyseMethodType) {
         && !([self supportedInterfaceOrientations] & UIInterfaceOrientationMaskLandscapeLeft)) {
         [self forceChangeToOrientation:UIInterfaceOrientationPortrait];
     }
+    // GA
+    id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
+    [tracker set:kGAIScreenName value:[NSString stringWithUTF8String:object_getClassName(self)]];
+    [tracker send:[[GAIDictionaryBuilder createScreenView] build]];
 }
 
 - (void)tabBarItemClicked{
@@ -231,11 +235,7 @@ typedef NS_ENUM(NSInteger, AnalyseMethodType) {
                 }
             }
             if (!analyseVC) {
-                if([path rangeOfString:@"merge"].location == NSNotFound) {
-                     analyseVC = [PRDetailViewController vcWithPath:path];
-                } else {
-                    analyseVC = [MRDetailViewController vcWithPath:path];
-                }
+                analyseVC = [PRDetailViewController vcWithPath:path];
             }
         }
     }else if ((matchedCaptures = [linkStr captureComponentsMatchedByRegex:topicRegexStr]).count > 0){

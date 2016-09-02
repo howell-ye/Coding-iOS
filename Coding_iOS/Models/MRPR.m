@@ -70,14 +70,6 @@
     return [[self p_prePath] stringByAppendingString:@"base"];
 }
 
-- (NSString *)toPrePath{
-    return [self p_prePath];
-}
-
-- (NSString *)toReviewersPath {
-     return [[self p_prePath] stringByAppendingString:@"reviewers"];
-}
-
 - (NSString *)toCommitsPath{
     return [[self p_prePath] stringByAppendingString:@"commits"];
 }
@@ -104,14 +96,6 @@
     return [[self p_prePath] stringByAppendingString:@"cancel"];
 }
 
-- (NSString *)toCancelMRPath{
-    return [[self path] stringByAppendingString:@"cancel"];
-}
-
-- (NSString *)toAuthorizationPath{
-    return [[self p_prePath] stringByAppendingString:@"grant"];
-}
-
 - (NSString *)toFileChangesPath{
     return [[self p_prePath] stringByAppendingString:@"commitDiffStat"];
 }
@@ -122,7 +106,6 @@
     if (pathComponents.count == 8) {
         prePath = [NSString stringWithFormat:@"api/user/%@/project/%@/git/%@/%@/", pathComponents[2], pathComponents[4], pathComponents[6], pathComponents[7]];
     }
-    NSLog(@"path === %@", prePath);
     return prePath;
 }
 

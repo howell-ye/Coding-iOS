@@ -15,7 +15,6 @@
 #import "Coding_NetAPIManager.h"
 #import "MRPRListCell.h"
 #import "PRDetailViewController.h"
-#import "MRDetailViewController.h"
 
 @interface PRListViewController ()<UITableViewDataSource, UITableViewDelegate>
 @property (strong, nonatomic) NSMutableDictionary *dataDict;
@@ -64,9 +63,6 @@
 
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
-    if([self curMRPRS].list.count <= 0) {
-        [self.view configBlankPage:EaseBlankPageTypeTaskResource hasData:NO hasError:NO reloadButtonBlock:nil];
-    }
     [self refresh];
 }
 
@@ -193,18 +189,10 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     MRPR *curMRPR = [[self curMRPRS].list objectAtIndex:indexPath.row];
-    if(curMRPR.isPR) {
-        PRDetailViewController *vc = [PRDetailViewController new];
-        vc.curMRPR = curMRPR;
-        vc.curProject = _curProject;
-        [self.navigationController pushViewController:vc animated:YES];
-    } else {
-        MRDetailViewController *vc = [MRDetailViewController new];
-        vc.curMRPR = curMRPR;
-        vc.curProject = _curProject;
-        [self.navigationController pushViewController:vc animated:YES];
-    }
-   
+    PRDetailViewController *vc = [PRDetailViewController new];
+    vc.curMRPR = curMRPR;
+    vc.curProject = _curProject;
+    [self.navigationController pushViewController:vc animated:YES];
 }
 
 

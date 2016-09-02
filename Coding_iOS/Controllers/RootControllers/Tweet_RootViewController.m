@@ -287,8 +287,6 @@
 #pragma mark - nav_LeftBtn
 
 - (void)hotTopicBtnClicked:(id)sender{
-    [MobClick event:kUmeng_Event_Request_ActionOfLocal label:@"冒泡_点击话题"];
-    
     CSHotTopicPagesVC *vc = [CSHotTopicPagesVC new];
     [self.navigationController pushViewController:vc animated:YES];
 }
@@ -406,7 +404,7 @@
         }
         [_myMsgInputView notAndBecomeFirstResponder];
     };
-    cell.cellRefreshBlock = ^(){
+    cell.likeBtnClickedBlock = ^(Tweet *tweet){
         [weakSelf.myTableView reloadData];
     };
     cell.userBtnClickedBlock = ^(User *curUser){
@@ -439,7 +437,7 @@
     cell.goToDetailTweetBlock = ^(Tweet *curTweet){
         [self goToDetailWithTweet:curTweet];
     };
-    cell.cellRefreshBlock = ^(){
+    cell.refreshSingleCCellBlock = ^(){
         [weakSelf.myTableView reloadData];
     };
     cell.mediaItemClickedBlock = ^(HtmlMediaItem *curItem){
@@ -547,12 +545,9 @@
 }
 
 - (void)sendCurComment:(Tweet *)commentObj{
-    [NSObject showHUDQueryStr:@"正在发表评论..."];
     __weak typeof(self) weakSelf = self;
     [[Coding_NetAPIManager sharedManager] request_Tweet_DoComment_WithObj:commentObj andBlock:^(id data, NSError *error) {
-        [NSObject hideHUDQuery];
         if (data) {
-            [NSObject showHudTipStr:@"评论成功"];
             Comment *resultCommnet = (Comment *)data;
             resultCommnet.owner = [Login curLoginUser];
             [commentObj addNewComment:resultCommnet];

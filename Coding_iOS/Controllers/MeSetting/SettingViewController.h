@@ -10,7 +10,7 @@
 #import "BaseViewController.h"
 #import "User.h"
 
-@interface SettingViewController : BaseViewController
+@interface SettingViewController : BaseViewController<UITableViewDataSource, UITableViewDelegate, UIActionSheetDelegate>
 
 @property (strong, nonatomic) User *myUser;
 

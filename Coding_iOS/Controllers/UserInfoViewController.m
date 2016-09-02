@@ -9,6 +9,7 @@
 #import "UserInfoViewController.h"
 #import "Coding_NetAPIManager.h"
 #import "FunctionTipsManager.h"
+
 #import "MJPhotoBrowser.h"
 #import "UsersViewController.h"
 #import "ConversationViewController.h"
@@ -19,7 +20,6 @@
 #import "UserInfoDetailViewController.h"
 #import "ProjectListViewController.h"
 #import "LocalFoldersViewController.h"
-#import "ReviewerListController.h"
 
 #import "RDVTabBarController.h"
 #import "RDVTabBarItem.h"

@@ -36,7 +36,6 @@
 
 + (NSString *)sizeDisplayWithByte:(CGFloat)sizeOfByte;
 
-- (NSString *)stringByRemoveSpecailCharacters;
 - (NSString *)trimWhitespace;
 - (BOOL)isEmpty;
 - (BOOL)isEmptyOrListening;

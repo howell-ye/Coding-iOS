@@ -301,15 +301,6 @@
     return sizeDisplayStr;
 }
 
-- (NSString *)stringByRemoveSpecailCharacters{
-    static NSCharacterSet *specailCharacterSet;
-    if (!specailCharacterSet) {
-        NSMutableString *specailCharacters = @"\u2028\u2029".mutableCopy;
-        specailCharacterSet = [NSCharacterSet characterSetWithCharactersInString:specailCharacters];
-    }
-    return [[self componentsSeparatedByCharactersInSet:specailCharacterSet] componentsJoinedByString:@""];
-}
-
 - (NSString *)trimWhitespace
 {
     NSMutableString *str = [self mutableCopy];
@@ -341,8 +332,7 @@
 }
 //判断是否是手机号码或者邮箱
 - (BOOL)isPhoneNo{
-//    NSString *phoneRegex = @"1[3|5|7|8|][0-9]{9}";
-    NSString *phoneRegex = @"[0-9]{1,15}";
+    NSString *phoneRegex = @"1[3|5|7|8|][0-9]{9}";
     NSPredicate *phoneTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", phoneRegex];
     return [phoneTest evaluateWithObject:self];
 }

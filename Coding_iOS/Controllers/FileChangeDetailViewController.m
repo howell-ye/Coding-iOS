@@ -70,10 +70,10 @@
 - (void)refreshUI{
     if (self.rawData) {
         NSData *JSONDataRaw = [NSJSONSerialization dataWithJSONObject:self.rawData options:NSJSONWritingPrettyPrinted error:nil];
-        NSString *contentStr = [[[NSString alloc] initWithData:JSONDataRaw encoding:NSUTF8StringEncoding] stringByRemoveSpecailCharacters];
+        NSString *contentStr = [[NSString alloc] initWithData:JSONDataRaw encoding:NSUTF8StringEncoding];
         
         NSData *JSONDataComments = [NSJSONSerialization dataWithJSONObject:self.commentsData options:NSJSONWritingPrettyPrinted error:nil];
-        NSString *commentsStr = [[[NSString alloc] initWithData:JSONDataComments encoding:NSUTF8StringEncoding] stringByRemoveSpecailCharacters];
+        NSString *commentsStr = [[NSString alloc] initWithData:JSONDataComments encoding:NSUTF8StringEncoding];
         
         contentStr = [WebContentManager diffPatternedWithContent:contentStr andComments:commentsStr];
         [self.webContentView loadHTMLString:contentStr baseURL:nil];

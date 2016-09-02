@@ -24,8 +24,9 @@
     __weak typeof(self) weakSelf = self;
     ProjectListView *listView = [[ProjectListView alloc] initWithFrame:self.view.bounds projects:self.curPros block:^(Project *project) {
         if (weakSelf.projectChoosedBlock) {
-            weakSelf.projectChoosedBlock(self, project);
+            weakSelf.projectChoosedBlock(project);
         }
+        [weakSelf.navigationController popViewControllerAnimated:YES];
     } tabBarHeight:0];
     [self.view addSubview:listView];
     [listView mas_makeConstraints:^(MASConstraintMaker *make) {

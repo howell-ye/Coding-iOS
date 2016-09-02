@@ -216,7 +216,7 @@
                 if (_taskChangedBlock) {
                     _taskChangedBlock();
                 }
-                [self handleDone];
+                [self.navigationController popViewControllerAnimated:YES];
             }
         }];
     }else{
@@ -232,7 +232,7 @@
                 if (_taskChangedBlock) {
                     _taskChangedBlock();
                 }
-                [self handleDone];
+                [self.navigationController popViewControllerAnimated:YES];
             }else{
                 [NSObject showStatusBarError:error];
             }
@@ -240,13 +240,6 @@
     }
 }
 
-- (void)handleDone{
-    if (self.doneBlock) {
-        self.doneBlock(self);
-    }else{
-        [self.navigationController popViewControllerAnimated:YES];
-    }
-}
 - (void)deleteTask:(Task *)toDelete{
     if (toDelete.isRequesting) {
         return;
@@ -281,12 +274,9 @@
 }
 
 - (void)sendCurComment:(Task *)commentObj{
-    [NSObject showHUDQueryStr:@"正在发表评论..."];
     __weak typeof(self) weakSelf = self;
     [[Coding_NetAPIManager sharedManager] request_DoCommentToTask:commentObj andBlock:^(id data, NSError *error) {
-        [NSObject hideHUDQuery];
         if (data) {
-            [NSObject showHudTipStr:@"评论成功"];
             [weakSelf queryToRefreshActivityList];
             [weakSelf queryToRefreshResourceReference];
             [weakSelf.myTableView reloadData];
@@ -467,15 +457,16 @@
         LeftImage_LRTextCellType cellType = _myCopyTask.handleType == TaskHandleTypeAddWithoutProject? indexPath.row : indexPath.row +1;
         if (cellType == LeftImage_LRTextCellTypeTaskProject) {
             ProjectToChooseListViewController *vc = [[ProjectToChooseListViewController alloc] init];
-            vc.projectChoosedBlock = ^(ProjectToChooseListViewController *blockChooseVC, Project *project){
+            vc.projectChoosedBlock = ^(Project *project){
                 ESStrongSelf;
                 _self.myCopyTask.project = project;
                 _self.myCopyTask.owner = nil;//更换新的执行人
                 [_self.myCopyTask.labels removeAllObjects];
                 [_self.myTableView reloadData];
-                [blockChooseVC.navigationController popViewControllerAnimated:YES];
             };
             [self.navigationController pushViewController:vc animated:YES];
+
+            NSLog(@"haimeizuo");
         }else if (cellType == LeftImage_LRTextCellTypeTaskOwner) {
             if (_myCopyTask.project == nil) {
                 [NSObject showHudTipStr:@"需要选定所属项目先~"];
@@ -537,10 +528,7 @@
         }
     }else if (indexPath.section == 2 && _myTask.resourceReference.itemList.count > 0){
         TaskResourceReferenceViewController *vc = [TaskResourceReferenceViewController new];
-        vc.resourceReference = _myTask.resourceReference;
-        vc.resourceReferencePath = [self.myTask backend_project_path];
-        vc.number = self.myTask.number;
-        vc.resourceReferenceFromType = @1;
+        vc.curTask = _myTask;
         [self.navigationController pushViewController:vc animated:YES];
     }else {
         ProjectActivity *curActivity = [self.myCopyTask.activityList objectAtIndex:indexPath.row];
@@ -591,7 +579,7 @@
 }
 
 - (void)tagsHasChanged:(NSMutableArray *)selectedTags fromVC:(EditLabelViewController *)vc{
-    if ([ProjectTag tags:self.myCopyTask.labels isEqualTo:selectedTags] || self.myCopyTask.handleType > TaskHandleTypeEdit) {
+    if ([ProjectTag tags:self.myCopyTask.labels isEqualTo:self.myTask.labels] || self.myCopyTask.handleType > TaskHandleTypeEdit) {
         self.myTask.labels = [selectedTags mutableCopy];
         self.myCopyTask.labels = [selectedTags mutableCopy];
         [self.myTableView reloadData];

@@ -16,7 +16,6 @@
 #import "Coding_NetAPIManager.h"
 #import "Login.h"
 #import "Close2FAViewController.h"
-#import "SettingEmailViewController.h"
 
 @interface SettingAccountViewController ()
 @property (strong, nonatomic) User *myUser;
@@ -88,15 +87,18 @@
         return cell;
     }else if (indexPath.section == 1){
         if (indexPath.row == 0) {
-            
-            TitleValueMoreCell *cell = [tableView dequeueReusableCellWithIdentifier:kCellIdentifier_TitleValueMore forIndexPath:indexPath];
-            
-            NSString *valueStr = (self.myUser.email.length <= 0? @"未绑定":
-                                  self.myUser.email_validation.boolValue? self.myUser.email:
-                                  [NSString stringWithFormat:@"%@ 未验证",self.myUser.email]);
-            [cell setTitleStr:@"邮箱" valueStr:valueStr];
-            [tableView addLineforPlainCell:cell forRowAtIndexPath:indexPath withLeftSpace:kPaddingLeftWidth];
-            return cell;
+            if (self.myUser.email_validation.boolValue || self.myUser.email.length <= 0) {
+                TitleValueCell *cell = [tableView dequeueReusableCellWithIdentifier:kCellIdentifier_TitleValue forIndexPath:indexPath];
+                cell.selectionStyle = UITableViewCellSelectionStyleNone;
+                [cell setTitleStr:@"邮箱" valueStr:self.myUser.email.length > 0 ? self.myUser.email: @"未绑定"];
+                [tableView addLineforPlainCell:cell forRowAtIndexPath:indexPath withLeftSpace:kPaddingLeftWidth];
+                return cell;
+            }else{
+                TitleValueMoreCell *cell = [tableView dequeueReusableCellWithIdentifier:kCellIdentifier_TitleValueMore forIndexPath:indexPath];
+                [cell setTitleStr:@"邮箱" valueStr:[NSString stringWithFormat:@"%@ 未验证",self.myUser.email]];
+                [tableView addLineforPlainCell:cell forRowAtIndexPath:indexPath withLeftSpace:kPaddingLeftWidth];
+                return cell;
+            }
         }else{
             TitleValueMoreCell *cell = [tableView dequeueReusableCellWithIdentifier:kCellIdentifier_TitleValueMore forIndexPath:indexPath];
             [cell setTitleStr:@"手机号码" valueStr:self.myUser.phone.length > 0 ? self.myUser.phone: @"未绑定"];
@@ -138,9 +140,6 @@
                     }
                 }];
                 [alertView show];
-            }else{
-                SettingEmailViewController *vc = [SettingEmailViewController new];
-                [self.navigationController pushViewController:vc animated:YES];
             }
         }else{
             SettingPhoneViewController *vc = [[SettingPhoneViewController alloc] init];

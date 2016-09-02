@@ -22,8 +22,6 @@
 #import "TweetDetailViewController.h"
 #import "CSTopicDetailVC.h"
 #import "WebViewController.h"
-#import "SVPullToRefresh.h"
-#import "ODRefreshControl.h"
 
 #define kCommentIndexNotFound -1
 
@@ -42,7 +40,7 @@
 @property (nonatomic, strong) User *commentToUser;
 
 @property (nonatomic, assign) NSInteger curIndex;
-@property (nonatomic, strong) ODRefreshControl *refreshControl;
+
 @end
 
 @implementation CSTopicDetailVC{
@@ -52,42 +50,35 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    _curIndex = 0;
     [self setupData];
     [self setupUI];
-    _refreshControl = [[ODRefreshControl alloc] initInScrollView:self.myTableView];
-    [_refreshControl addTarget:self action:@selector(refresh) forControlEvents:UIControlEventValueChanged];
-
+    
+    _curIndex = 0;
+    
     [self.myTableView reloadData];
-    __weak typeof(self) weakSelf = self;
-    [self.myTableView addInfiniteScrollingWithActionHandler:^{
-        [weakSelf sendRequestLoadMore:YES];
-    }];
-    [self refresh];
-}
-
-- (void)refresh{
     [self refreshheader];
     [self refreshTopTweet];
-    [self sendRequestLoadMore:NO];
+    
+    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, 0.5 * NSEC_PER_SEC);
+    dispatch_after(popTime, dispatch_get_main_queue(), ^{
+        [self sendRequest];
+    });
+    
 }
 
-- (void)sendRequestLoadMore:(BOOL)loadMore{
-    if (_curTweets.isLoading) {
-        return;
-    }
-    _curTweets.willLoadMore = loadMore;
-    _curTweets.isLoading = YES;
+- (void)sendRequest{
     __weak typeof(self) weakSelf = self;
-    NSNumber *last_id = nil;
-    if (_curTweets.willLoadMore && _curTweets.list.count > 0) {
-        last_id = [(Tweet *)_curTweets.list.lastObject id];
-    }
-    [[Coding_NetAPIManager sharedManager] request_PublicTweetsWithTopic:_topicID last_id:last_id andBlock:^(NSArray *datalist, NSError *error) {
-        [weakSelf.refreshControl endRefreshing];
-        [weakSelf.myTableView.infiniteScrollingView stopAnimating];
-        weakSelf.curTweets.isLoading = NO;
-        [weakSelf.curTweets configWithTweets:datalist];
+    
+    [[Coding_NetAPIManager sharedManager] request_PublicTweetsWithTopic:_topicID andBlock:^(NSArray *datalist, NSError *error) {
+        NSMutableArray *list = [NSMutableArray array];
+        [datalist enumerateObjectsUsingBlock:^(Tweet* obj, NSUInteger idx, BOOL *stop) {
+            if (self.curTopWteet && [self.curTopWteet.id isEqualToNumber:obj.id]) {
+                
+            }else{
+                [list addObject:obj];
+            }
+        }];
+        [weakSelf.curTweets configWithTweets:list];
         [weakSelf.myTableView reloadData];
     }];
 }
@@ -206,7 +197,7 @@
         }
         [_myMsgInputView notAndBecomeFirstResponder];
     };
-    cell.cellRefreshBlock = ^(){
+    cell.likeBtnClickedBlock = ^(Tweet *tweet){
         [weakSelf.myTableView reloadData];
     };
     cell.userBtnClickedBlock = ^(User *curUser){
@@ -306,6 +297,9 @@
     }
 }
 
+
+
+
 #pragma mark UIMessageInputViewDelegate
 - (void)messageInputView:(UIMessageInputView *)inputView sendText:(NSString *)text{
     [self sendCommentMessage:text];
@@ -347,12 +341,9 @@
 }
 
 - (void)sendCurComment:(Tweet *)commentObj{
-    [NSObject showHUDQueryStr:@"正在发表评论..."];
     __weak typeof(self) weakSelf = self;
     [[Coding_NetAPIManager sharedManager] request_Tweet_DoComment_WithObj:commentObj andBlock:^(id data, NSError *error) {
-        [NSObject hideHUDQuery];
         if (data) {
-            [NSObject showHudTipStr:@"评论成功"];
             Comment *resultCommnet = (Comment *)data;
             resultCommnet.owner = [Login curLoginUser];
             [commentObj addNewComment:resultCommnet];
@@ -414,16 +405,31 @@
 }
 
 - (void)sendTweet{
-    __weak typeof(self) weakSelf = self;
+//    __weak typeof(self) weakSelf = self;
     TweetSendViewController *vc = [[TweetSendViewController alloc] init];
     vc.sendNextTweet = ^(Tweet *nextTweet){
         [nextTweet saveSendData];//发送前保存草稿
         [[Coding_NetAPIManager sharedManager] request_Tweet_DoTweet_WithObj:nextTweet andBlock:^(id data, NSError *error) {
             if (data) {
                 [Tweet deleteSendData];//发送成功后删除草稿
-                [weakSelf refresh];
+//                Tweets *curTweets = [weakSelf getCurTweets];
+//                if (curTweets.tweetType != TweetTypePublicHot) {
+//                    Tweet *resultTweet = (Tweet *)data;
+//                    resultTweet.owner = [Login curLoginUser];
+//                    if (curTweets.list && [curTweets.list count] > 0) {
+//                        [curTweets.list insertObject:data atIndex:0];
+//                    }else{
+//                        curTweets.list = [NSMutableArray arrayWithObject:resultTweet];
+//                    }
+//                    [self.myTableView reloadData];
+//                }
+//                [weakSelf.view configBlankPage:EaseBlankPageTypeTweet hasData:(curTweets.list.count > 0) hasError:(error != nil) reloadButtonBlock:^(id sender) {
+//                    [weakSelf sendRequest];
+//                }];
             }
+            
         }];
+        
     };
     UINavigationController *nav = [[BaseNavigationController alloc] initWithRootViewController:vc];
     [self.parentViewController presentViewController:nav animated:YES completion:nil];
@@ -439,7 +445,7 @@
             [_self.myTableView reloadData];
             [_self.view configBlankPage:([[Login curLoginUser] isSameToUser:_self.curTweets.curUser]? EaseBlankPageTypeTweet: EaseBlankPageTypeTweetOther)  hasData:(_self.curTweets.list.count > 0) hasError:NO reloadButtonBlock:^(id sender) {
                 ESStrongSelf;
-                [_self refresh];
+                [_self sendRequest];
             }];
         }
     }];

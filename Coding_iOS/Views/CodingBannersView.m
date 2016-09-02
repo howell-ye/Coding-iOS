@@ -9,7 +9,6 @@
 #import "CodingBannersView.h"
 #import "SMPageControl.h"
 #import "AutoSlideScrollView.h"
-#import "YLImageView.h"
 
 @interface CodingBannersView ()
 @property (assign, nonatomic) CGFloat padding_top, padding_bottom, image_width, ratio;
@@ -97,7 +96,7 @@
             };
             slideView.fetchContentViewAtIndex = ^UIView *(NSInteger pageIndex){
                 if (weakSelf.curBannerList.count > pageIndex) {
-                    YLImageView *imageView = [weakSelf p_reuseViewForIndex:pageIndex];
+                    UIImageView *imageView = [weakSelf p_reuseViewForIndex:pageIndex];
                     CodingBanner *curBanner = weakSelf.curBannerList[pageIndex];
                     [imageView sd_setImageWithURL:[curBanner.image urlWithCodePath]];
                     return imageView;
@@ -129,18 +128,18 @@
     NSLog(@"%@", _curBannerList);
 }
 
-- (YLImageView *)p_reuseViewForIndex:(NSInteger)pageIndex{
+- (UIImageView *)p_reuseViewForIndex:(NSInteger)pageIndex{
     if (!_imageViewList) {
         _imageViewList = [[NSMutableArray alloc] initWithCapacity:3];
         for (int i = 0; i < 3; i++) {
-            YLImageView *view = [[YLImageView alloc] initWithFrame:CGRectMake(kPaddingLeftWidth, _padding_top, _image_width, _image_width * _ratio)];
+            UIImageView *view = [[UIImageView alloc] initWithFrame:CGRectMake(kPaddingLeftWidth, _padding_top, _image_width, _image_width * _ratio)];
             view.backgroundColor = [UIColor colorWithHexString:@"0xe5e5e5"];
             view.clipsToBounds = YES;
             view.contentMode = UIViewContentModeScaleAspectFill;
             [_imageViewList addObject:view];
         }
     }
-    YLImageView *imageView;
+    UIImageView *imageView;
     NSInteger currentPageIndex = self.mySlideView.currentPageIndex;
     if (pageIndex == currentPageIndex) {
         imageView = _imageViewList[1];
